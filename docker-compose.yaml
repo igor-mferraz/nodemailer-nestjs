@@ -1,8 +1,22 @@
 version: '3'
 
 services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: kafka_nestjs
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   app:
+    depends_on:
+      - postgres
     build: .
     ports:
       - 3000:3000
@@ -58,9 +72,5 @@ services:
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
   
-  mysql:
-    image: mysql:8.0.30-debian
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-    volumes:
-      - ./.docker/mysql:/docker-entrypoint-initdb.d
+volumes:
+  postgres_data:
